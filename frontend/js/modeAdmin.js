@@ -43,6 +43,40 @@ function resetNilaiError() {
     });
 }
 
+function resetErrors() {
+    document.getElementById("nis").classList.remove("input-error");
+    document.getElementById("nama").classList.remove("input-error");
+    document.getElementById("kelas").classList.remove("input-error");
+
+    document.getElementById("errNis").classList.add("d-none");
+    document.getElementById("errNama").classList.add("d-none");
+    document.getElementById("errKelas").classList.add("d-none");
+}
+
+function checkNisUnique() {
+    const nisInput = document.getElementById("nis");
+    const errNis = document.getElementById("errNis");
+    const nis = nisInput.value.trim();
+    const editIndexStr = document.getElementById("editIndex").value;
+    const editIndex = editIndexStr === "" ? -1 : parseInt(editIndexStr);
+
+    if (!nis) {
+        nisInput.classList.remove("input-error");
+        errNis.classList.add("d-none");
+        return;
+    }
+
+    const nisExists = users.some((u, i) => u.nis === nis && i !== editIndex);
+    if (nisExists) {
+        nisInput.classList.add("input-error");
+        errNis.textContent = "nis tidak boleh sama";
+        errNis.classList.remove("d-none");
+    } else {
+        nisInput.classList.remove("input-error");
+        errNis.classList.add("d-none");
+    }
+}
+
 // PASSWORD GENERATOR
 function generatePassword(absen, nis) {
     let randomPart = "";
@@ -88,6 +122,7 @@ function saveUser() {
     const nama = namaInput.value.trim();
     const kelas = kelasInput.value.trim();
     const editIndex = document.getElementById("editIndex").value;
+    const editIndexNum = editIndex === "" ? -1 : parseInt(editIndex);
 
     let valid = true;
 
@@ -116,16 +151,16 @@ function saveUser() {
     if (!valid) return;
 
     // VALIDASI NIS UNIK
-    const nisExists = users.some((u, i) => u.nis === nis && i != editIndex);
+    const nisExists = users.some((u, i) => u.nis === nis && i !== editIndexNum);
     if (nisExists) {
         nisInput.classList.add("input-error");
-        errNis.textContent = "NIS sudah terdaftar";
+        errNis.textContent = "nis tidak boleh sama";
         errNis.classList.remove("d-none");
         return;
     }
 
     // TAMBAH USER BARU
-    if (editIndex === "") {
+    if (editIndexNum === -1) {
         const absen = users.length > 0
             ? Math.max(...users.map(u => u.absen || 0)) + 1
             : 1;
@@ -189,7 +224,7 @@ function renderAll() {
             <td>${u.password}</td>
             <td>
                 <button class="btn btn-warning btn-sm" onclick="editUser(${i})">Edit</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteUser(${i})">Hapus</button>
+                <button class="btn btn-danger btn-sm" onclick="hapusSiswa(${i})">Hapus</button>
             </td>
         </tr>
         `;
@@ -299,21 +334,48 @@ function editUser(index) {
 }
 
 // DELETE USER
-function deleteUser(index) {
-    if (confirm("Hapus siswa ini?")) {
-        users.splice(index, 1);
-        saveToStorage();
-        renderAll();
+let deleteIndex = null;
+let deleteModalInstance = null;
+
+function hapusSiswa(index) {
+    // alert("Hapus siswa index: " + index); // debug
+    deleteIndex = index; // simpan index siswa
+    const deleteModalEl = document.getElementById("deleteModal");
+    if (!deleteModalEl) {
+        alert("Modal delete tidak ditemukan!");
+        return;
+    }
+    try {
+        deleteModalInstance = new bootstrap.Modal(deleteModalEl);
+        deleteModalInstance.show();
+    } catch (e) {
+        alert("Error membuka modal: " + e.message);
+    }
+}
+
+function confirmDelete() {
+    if (deleteIndex !== null) {
+        users.splice(deleteIndex, 1); // hapus dari array
+        saveToStorage(); // simpan ke localStorage
+        renderAll(); // update tabel
+        deleteIndex = null;
+    }
+    if (deleteModalInstance) {
+        deleteModalInstance.hide();
     }
 }
 
 // LOGOUT
 function logout() {
-    if (confirm("Yakin ingin logout?")) {
-        localStorage.removeItem("isAdminLogin");
-        window.location.href = "./login.html";
-    }
+    const modal = new bootstrap.Modal(document.getElementById("logoutModal"));
+    modal.show();
 }
+
+function confirmLogout() {
+    localStorage.removeItem("isAdminLogin");
+    window.location.href = "./login.html";
+}
+
 
 // INIT
 renderAll();

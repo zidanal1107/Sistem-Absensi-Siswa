@@ -75,6 +75,55 @@
 </div>
 
 <body>
+    <!-- DELETE SISWA -->
+    <div class="modal fade" id="deleteModal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Konfirmasi Hapus</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body text-center">
+                    <p class="fw-semibold">
+                        Yakin ingin menghapus siswa ini?
+                        <br><small class="text-muted">Data tidak bisa dikembalikan.</small>
+                    </p>
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button class="btn btn-danger" onclick="confirmDelete()">Hapus</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGOUT -->
+    <div class="modal fade" id="logoutModal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Konfirmasi Logout</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body text-center">
+                    <p class="fw-semibold">Yakin ingin logout dari admin?</p>
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button class="btn btn-danger" onclick="confirmLogout()">Logout</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <!-- SIDEBAR -->
     <div class="sidebar">
         <h4 class="fw-bold mb-4">Admin Panel</h4>
@@ -145,7 +194,7 @@
 
                     <div class="mb-2">
                         <label>NIS</label>
-                        <input type="text" id="nis" class="form-control">
+                        <input type="text" id="nis" class="form-control" oninput="checkNisUnique()">
                         <div id="errNis" class="error-text d-none">NIS wajib diisi</div>
                     </div>
 
@@ -216,8 +265,6 @@
             alert("Silakan login dulu!");
             window.location.href = "./login.html";
         }
-    </script>
-
     </script>
 
 </body>
